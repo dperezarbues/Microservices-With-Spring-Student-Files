@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    config:
+      uri: http://localhost:8001
+  profiles:
+    active: northamerica
+  application:
+    name: lab-3-client
+server:
+  port: 8002

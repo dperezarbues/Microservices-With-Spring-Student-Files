@@ -1,7 +1,11 @@
 package demo.service;
 
+import rx.Observable;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 import demo.dao.AdjectiveClient;
 import demo.dao.ArticleClient;
@@ -21,27 +25,45 @@ public class WordServiceImpl implements WordService {
 	
 	
 	@Override
-	public Word getSubject() {
-		return subjectClient.getWord();
+	@HystrixCommand(fallbackMethod="getSubjectFallback")
+	public Observable<Word> getSubject() {
+		return Observable.just(subjectClient.getWord());
+	}
+	
+	public Observable<Word> fallback() {
+		return Observable.just(new Word(""));
+	}
+	
+	public Observable<Word> getSubjectFallback() {
+		return Observable.just(new Word("Someone"));
+	}
+	
+	public Observable<Word> getNounFallback() {
+		return Observable.just(new Word("something"));
+	}
+	
+	
+	@Override
+	@HystrixCommand(fallbackMethod="fallback")
+	public Observable<Word> getVerb() {
+		return Observable.just(verbClient.getWord());
 	}
 	
 	@Override
-	public Word getVerb() {
-		return verbClient.getWord();
+	@HystrixCommand(fallbackMethod="fallback")
+	public Observable<Word> getArticle() {
+		return Observable.just(articleClient.getWord());
 	}
 	
 	@Override
-	public Word getArticle() {
-		return articleClient.getWord();
+	@HystrixCommand(fallbackMethod="fallback")
+	public Observable<Word> getAdjective() {
+		return Observable.just(adjectiveClient.getWord());
 	}
 	
 	@Override
-	public Word getAdjective() {
-		return adjectiveClient.getWord();
-	}
-	
-	@Override
-	public Word getNoun() {
-		return nounClient.getWord();
+	@HystrixCommand(fallbackMethod="getNounFallback")
+	public Observable<Word> getNoun() {
+		return Observable.just(nounClient.getWord());
 	}	
 }

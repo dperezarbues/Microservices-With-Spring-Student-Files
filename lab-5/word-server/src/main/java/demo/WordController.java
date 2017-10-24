@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class WordController {
 
-	@Value("${words}") String words;
+	//@Value("${words}") String words;
+	
+	String words = "icicle,refrigerator,blizzard,snowball";
 	
 	@GetMapping("/")
 	public @ResponseBody String getWord() {

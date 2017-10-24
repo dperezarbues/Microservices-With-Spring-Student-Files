@@ -1,7 +1,12 @@
 package demo.service;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import rx.Observable;
+import rx.Single;
 
 /**
  * Build a sentence by assembling randomly generated subjects, verbs, 
@@ -17,14 +22,18 @@ public class SentenceServiceImpl implements SentenceService {
 	/**
 	 * Assemble a sentence by gathering random words of each part of speech:
 	 */
-	public String buildSentence() {
-		return  
-			String.format("%s %s %s %s %s.",
-				wordService.getSubject().getString(),
-				wordService.getVerb().getString(),
+	public Single<String> buildSentence() {
+		return Observable.zip(wordService.getSubject().map(w->w.getString()),
+				wordService.getVerb().map(w->w.getString()),
+				wordService.getArticle().map(w->w.getString()),
+				wordService.getAdjective().map(w->w.getString()),
+				wordService.getNoun().map(w->w.getString())
+								,(t1,t2,t3,t4,t5) -> t1 + " " + t2 + " " + t3 + " " + t4 + " " + t5).toSingle();
+				
+		/*		wordService.getVerb().getString(),
 				wordService.getArticle().getString(),
 				wordService.getAdjective().getString(),
-				wordService.getNoun().getString() )
-			;
+				wordService.getNoun().toBlocking().first().getString() )*/
+			
 	}	
 }
